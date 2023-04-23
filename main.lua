@@ -3,10 +3,15 @@
 -- Keeping this notice in your game is recommended.
 
 local game = {
+    -- scene system
     scenes = {
         menu = require "scenes.menu"
     },
     currentScene = "menu",
+
+    -- handlers
+    toasts = require "novum.toasts",
+
     title = "Novum Core Game"
 }
 
@@ -20,7 +25,7 @@ if not game.scenes.menu then
 end
 
 function game:discoverScene(name)
-    print(name)
+    -- print(name)
     game.scenes[name] = require("scenes." .. name)
     return game.scenes[name]
 end
@@ -37,17 +42,41 @@ function love.load()
     end
 end
 
+function love.keypressed(key)
+    local scene = game.scenes[game.currentScene]
+    if scene.keypressed then
+        scene:keypressed(game, key)
+    end
+end
+
+function love.keyreleased(key)
+    local scene = game.scenes[game.currentScene]
+    if scene.keyreleased then
+        scene:keyreleased(game, key)
+    end
+end
+
 function love.update(dt)
     local scene = game.scenes[game.currentScene]
     if scene.update then
         scene:update(game, dt)
     end
+
+    -- toast management
+    game.toasts:cleanToasts(5)
 end
 
 function love.draw()
     local scene = game.scenes[game.currentScene]
     if scene.draw then
         scene:draw(game)
+    end
+
+    -- toast management
+    local y = 5
+    for i, v in ipairs(game.toasts.toasts) do
+        local toast = game.toasts.toasts[i]
+        y = y + game.toasts:renderToast(toast, 5, 5, y) + 5
     end
 end
 
