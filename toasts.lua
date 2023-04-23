@@ -35,10 +35,11 @@ local ToastHandler = {
         local toastHeight = self.toastFont:getHeight() + 2*barWidth
 
         local toastColours = {
+            success = {0.3,   1, 0.3},
             debug = {0.6, 0.6, 0.6},
             info  = {0.5, 0.7, 0.9},
             warn  = {1,   0.7, 0.1},
-            error = {1,   0.3, 0.3}
+            error = {1,   0.3, 0.3},
         }
         local colour = toastColours[toast.type]
 
@@ -51,17 +52,23 @@ local ToastHandler = {
             local animRate = love.timer.getTime() - toast.timePosted - decay + 1
             toastAlpha = 1 - animRate
         end
+        local toastAnimatedX = -toastWidth
+        if love.timer.getTime() - toast.timePosted < 0.125 then
+            toastAnimatedX = -toastWidth + (toastWidth+x)*(love.timer.getTime() - toast.timePosted)*8
+        else
+            toastAnimatedX = x
+        end
 
         love.graphics.setFont(self.toastFont)
         love.graphics.setColor(0.2, 0.2, 0.2, toastAlpha)
-        love.graphics.rectangle('fill', x, y, toastWidth, toastHeight)
+        love.graphics.rectangle('fill', toastAnimatedX, y, toastWidth, toastHeight)
 
         love.graphics.setColor(colour[1], colour[2], colour[3], toastAlpha)
-        love.graphics.rectangle('fill', x, y, barWidth, toastHeight)
-        love.graphics.rectangle('line', x, y, toastWidth, toastHeight)
+        love.graphics.rectangle('fill', toastAnimatedX, y, barWidth, toastHeight)
+        love.graphics.rectangle('line', toastAnimatedX, y, toastWidth, toastHeight)
         
         love.graphics.setColor(1, 1, 1, toastAlpha)
-        love.graphics.print(toast.text, x + 2*barWidth, y + barWidth)
+        love.graphics.print(toast.text, toastAnimatedX + 2*barWidth, y + barWidth)
 
         -- restoring original colour and font
         love.graphics.setColor(r,g,b,a)
