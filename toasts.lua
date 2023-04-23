@@ -74,7 +74,7 @@ local ToastHandler = {
         love.graphics.setColor(r,g,b,a)
         love.graphics.setFont(font)
 
-        return toastHeight -- stacked rendering purposes
+        return toastHeight*math.min((love.timer.getTime() - toast.timePosted)*8, 1) -- stacked rendering purposes
     end
 }
 
