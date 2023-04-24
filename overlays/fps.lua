@@ -3,13 +3,11 @@ local FPSOverlay = {
     fpsFont = love.graphics.newFont(14),
 
     update = function(self, game, dt)
-        if dt > 0 then
-            self.fps = 1/dt
-        end
+        self.fps = love.timer.getFPS()
     end,
 
     draw = function(self, game)
-        local text = ("%.2f FPS"):format(self.fps)
+        local text = self.fps .. ' FPS'
         local width = self.fpsFont:getWidth(text) + 10
         local height = self.fpsFont:getHeight() + 10
 
