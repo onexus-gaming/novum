@@ -54,6 +54,10 @@ end
 
 function game:switchSceneInstant(name)
     game.currentScene = name
+    local scene = game.scenes[game.currentScene]
+    if scene.opened then
+        scene:opened(game)
+    end
 end
 
 function game:switchSceneByTransition(name, transition, duration)
