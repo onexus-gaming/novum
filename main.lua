@@ -8,6 +8,14 @@ local game = {
         initial = require "scenes.initial"
     },
     currentScene = "initial",
+    transitions = {},
+    currentSceneTransition = {
+        handler = nil,
+        start = 0,
+        duration = 0,
+        from = "",
+        to = ""
+    },
 
     -- handlers
     toasts = require "novum.toasts",
@@ -38,8 +46,26 @@ function game:discoverScene(name)
     return game.scenes[name]
 end
 
+function game:discoverTransition(name)
+    -- print(name)
+    game.transitions[name] = require("transitions." .. name)
+    return game.transitions[name]
+end
+
 function game:switchSceneInstant(name)
     game.currentScene = name
+end
+
+function game:switchSceneByTransition(name, transition, duration)
+    game.currentSceneTransition = {
+        handler = game.transitions[transition],
+        start = love.timer.getTime(),
+        duration = duration or 1,
+        from = game.currentScene,
+        to = name
+    }
+
+    game.currentSceneTransition.handler:pre(game, game.scenes[game.currentSceneTransition.from], game.scenes[game.currentSceneTransition.to])
 end
 
 function love.load()
@@ -65,9 +91,18 @@ function love.keyreleased(key)
 end
 
 function love.update(dt)
-    local scene = game.scenes[game.currentScene]
-    if scene.update then
-        scene:update(game, dt)
+    -- if transition is inactive
+    if not game.currentSceneTransition.handler then
+        local scene = game.scenes[game.currentScene]
+        if scene.update then
+            scene:update(game, dt)
+        end
+    else
+        local endTime = game.currentSceneTransition.start + game.currentSceneTransition.duration
+        if love.timer.getTime() >= endTime then
+            game.currentSceneTransition.handler = nil
+            game:switchSceneInstant(game.currentSceneTransition.to)
+        end
     end
 
     -- overlay management
@@ -82,9 +117,16 @@ function love.update(dt)
 end
 
 function love.draw()
-    local scene = game.scenes[game.currentScene]
-    if scene.draw then
-        scene:draw(game)
+    -- if transition is inactive
+    if not game.currentSceneTransition.handler then
+        local scene = game.scenes[game.currentScene]
+        if scene.draw then
+            scene:draw(game)
+        end
+    else
+        local endTime = game.currentSceneTransition.start + game.currentSceneTransition.duration
+        local position = 1 - (endTime - love.timer.getTime())/game.currentSceneTransition.duration
+        game.currentSceneTransition.handler:draw(game, position, game.scenes[game.currentSceneTransition.from], game.scenes[game.currentSceneTransition.to])
     end
 
     -- overlay management
