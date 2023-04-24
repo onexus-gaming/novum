@@ -10,14 +10,14 @@ local ToastHandler = {
     },
     toastFont = love.graphics.newFont(14),
 
-    postToast = function(self, type, text)
+    post = function(self, type, text)
         table.insert(self.toasts, 1, {
             type = type,
             text = text,
             timePosted = love.timer.getTime(),
         })
     end,
-    cleanToasts = function(self, decay)
+    clean = function(self, decay)
         local i = 1
         while i <= #self.toasts do
             local toast = self.toasts[i]
@@ -29,7 +29,7 @@ local ToastHandler = {
         end
     end,
 
-    renderToast = function(self, toast, decay, x, y)
+    renderSingle = function(self, toast, decay, x, y)
         local barWidth = 5
         local toastWidth = self.toastFont:getWidth(toast.text) + 3*barWidth
         local toastHeight = self.toastFont:getHeight() + 2*barWidth

@@ -5,12 +5,20 @@
 local game = {
     -- scene system
     scenes = {
-        menu = require "scenes.menu"
+        initial = require "scenes.initial"
     },
-    currentScene = "menu",
+    currentScene = "initial",
 
     -- handlers
     toasts = require "novum.toasts",
+
+    -- overlays
+    overlays = {
+        handlers = {
+            fps = require "novum.overlays.fps"
+        },
+        fps = false,
+    },
 
     title = "Novum Core Game"
 }
@@ -20,8 +28,8 @@ local game = {
 if #game.scenes == {} then
     error('No scene loaded.')
 end
-if not game.scenes.menu then
-    error('No menu found.')
+if not game.scenes.initial then
+    error('No initial scene found.')
 end
 
 function game:discoverScene(name)
@@ -30,7 +38,7 @@ function game:discoverScene(name)
     return game.scenes[name]
 end
 
-function game:moveScene(name)
+function game:switchSceneInstant(name)
     game.currentScene = name
 end
 
@@ -62,8 +70,15 @@ function love.update(dt)
         scene:update(game, dt)
     end
 
+    -- overlay management
+    for k, v in pairs(game.overlays.handlers) do
+        if game.overlays[k] and v.update then
+            v:update(game, dt)
+        end
+    end
+
     -- toast management
-    game.toasts:cleanToasts(5)
+    game.toasts:clean(5)
 end
 
 function love.draw()
@@ -72,11 +87,18 @@ function love.draw()
         scene:draw(game)
     end
 
+    -- overlay management
+    for k, v in pairs(game.overlays.handlers) do
+        if game.overlays[k] and v.draw then
+            v:draw(game)
+        end
+    end
+
     -- toast management
     local y = 5
     for i, v in ipairs(game.toasts.toasts) do
         local toast = game.toasts.toasts[i]
-        y = y + game.toasts:renderToast(toast, 5, 5, y) + 5
+        y = y + game.toasts:renderSingle(toast, 5, 5, y) + 5
     end
 end
 
