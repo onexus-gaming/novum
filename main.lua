@@ -19,6 +19,8 @@ local game = {
 
     -- handlers
     toasts = require "novum.toasts",
+    gameConfig = require "novum.gameConfig",
+    keyBinds = require "novum.keys",
 
     -- overlays
     overlays = {
