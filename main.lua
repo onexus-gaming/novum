@@ -31,10 +31,14 @@ local game = {
         fps = false,
         multitouch = false
     },
-    
-    mobileFullscreen = function()
+
+    isMobile = function()
         local osString = love.system.getOS()
-        if osString == 'Android' or osString == 'iOS' then
+        return osString == 'Android' or osString == 'iOS'
+    end,
+    
+    mobileFullscreen = function(self)
+        if self.isMobile() then
             love.window.setFullscreen(true)
         end
     end,
