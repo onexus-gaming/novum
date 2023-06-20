@@ -25,10 +25,19 @@ local game = {
     -- overlays
     overlays = {
         handlers = {
-            fps = require "novum.overlays.fps"
+            fps = require "novum.overlays.fps",
+            multitouch = require "novum.overlays.multitouch"
         },
         fps = false,
+        multitouch = false
     },
+    
+    mobileFullscreen = function()
+        local osString = love.system.getOS()
+        if osString == 'Android' or osString == 'iOS' then
+            love.window.setFullscreen(true)
+        end
+    end,
 
     title = "Novum Core Game"
 }
@@ -93,6 +102,27 @@ function love.keyreleased(key)
     local scene = game.scenes[game.currentScene]
     if scene.keyreleased then
         scene:keyreleased(game, key)
+    end
+end
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+    local scene = game.scenes[game.currentScene]
+    if scene.touchpressed then
+        scene:touchpressed(game, id, x, y, dx, dy, pressure)
+    end
+end
+
+function love.touchreleased(id, x, y, dx, dy, pressure)
+    local scene = game.scenes[game.currentScene]
+    if scene.touchreleased then
+        scene:touchreleased(game, id, x, y, dx, dy, pressure)
+    end
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+    local scene = game.scenes[game.currentScene]
+    if scene.touchmoved then
+        scene:touchmoved(game, id, x, y, dx, dy, pressure)
     end
 end
 
