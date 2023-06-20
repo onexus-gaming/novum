@@ -1,4 +1,4 @@
-# novum-core
+# novum
 
  Simple easy-to-use game core for LÖVE (LOVE2D)
 
