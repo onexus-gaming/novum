@@ -26,7 +26,7 @@ local game = {
     
     -- callback handlers
     callbackHandlers = {},
-    knownCallbacks = {'load', 'keypressed', 'keyreleased', 'touchpressed', 'touchreleased', 'touchmoved', 'update', 'draw'},
+    knownCallbacks = {'load', 'keypressed', 'keyreleased', 'textinput', 'touchpressed', 'touchreleased', 'touchmoved', 'update', 'draw', 'overlay'},
 
     -- handlers
     toasts = require "novum.toasts",
@@ -42,29 +42,6 @@ local game = {
         fps = false,
         multitouch = false
     },
-
-    isMobile = function()
-        local osString = love.system.getOS()
-        return osString == 'Android' or osString == 'iOS'
-    end,
-    
-    mobileFullscreen = function(self)
-        if self.isMobile() then
-            love.window.setFullscreen(true)
-        end
-    end,
-
-    hookCallback = function(self, eventName, callback) -- run game-wide code after callbacks
-        if self.callbackHandlers[eventName] == nil then
-            self.callbackHandlers[eventName] = {}
-        end
-        -- if the specified callback doesn't exist, show a gentle toast so as to prevent the game dev from ripping their hair apart because their piece of code never gets executed
-        -- trust me, i've gone through this a lot, i know how it is
-        if not table.contains(self.knownCallbacks, eventName) then
-            self.toasts:post('warn', 'novum:hookCallback: callback "'..eventName..'" doesn\'t exist.')
-        end
-        self.callbackHandlers[eventName] = callback
-    end,
 
     title = "Novum Core Game"
 }
@@ -82,6 +59,10 @@ function game:discoverScene(name)
     -- print(name)
     game.scenes[name] = require("scenes." .. name)
     return game.scenes[name]
+end
+
+function game:discoverAllScenes()
+    
 end
 
 function game:discoverTransition(name)
@@ -111,7 +92,35 @@ function game:switchSceneByTransition(name, transition, duration, data)
     game.currentSceneTransition.handler:pre(game, game.scenes[game.currentSceneTransition.from], game.scenes[game.currentSceneTransition.to])
 end
 
+function game.isMobile()
+    local osString = love.system.getOS()
+    return osString == 'Android' or osString == 'iOS'
+end
+
+function game:mobileFullscreen()
+    if self.isMobile() then
+        love.window.setFullscreen(true)
+    end
+end
+
+function game:hookCallback(eventName, callback) -- run game-wide code after callbacks
+    if self.callbackHandlers[eventName] == nil then
+        self.callbackHandlers[eventName] = {}
+    end
+    -- if the specified callback doesn't exist, show a gentle toast so as to prevent the game dev from ripping their hair apart because their piece of code never gets executed
+    -- trust me, i've gone through this a lot, i know how it is
+    if not table.contains(self.knownCallbacks, eventName) then
+        self.toasts:post('warn', 'novum:hookCallback: callback "'..eventName..'" doesn\'t exist.')
+    end
+    table.append(self.callbackHandlers[eventName], callback)
+end
+
 function love.load()
+    if game.callbackHandlers.load then
+        for k, v in pairs(game.callbackHandlers.load) do
+            v(game)
+        end
+    end
     for k, v in pairs(game.scenes) do
         if v.load then
             v:load()
@@ -121,6 +130,11 @@ end
 
 function love.keypressed(key)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.keypressed then
+        for k, v in pairs(game.callbackHandlers.keypressed) do
+            v(game, key)
+        end
+    end
     if scene.keypressed then
         scene:keypressed(game, key)
     end
@@ -128,6 +142,11 @@ end
 
 function love.keyreleased(key)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.keyreleased then
+        for k, v in pairs(game.callbackHandlers.keyreleased) do
+            v(game, key)
+        end
+    end
     if scene.keyreleased then
         scene:keyreleased(game, key)
     end
@@ -135,6 +154,11 @@ end
 
 function love.textinput(text)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.textinput then
+        for k, v in pairs(game.callbackHandlers.textinput) do
+            v(game, text)
+        end
+    end
     if scene.textinput then
         scene:textinput(game, text)
     end
@@ -142,6 +166,11 @@ end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.touchpressed then
+        for k, v in pairs(game.callbackHandlers.touchpressed) do
+            v(game, id, x, y, dx, dy, pressure)
+        end
+    end
     if scene.touchpressed then
         scene:touchpressed(game, id, x, y, dx, dy, pressure)
     end
@@ -149,6 +178,11 @@ end
 
 function love.touchreleased(id, x, y, dx, dy, pressure)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.touchreleased then
+        for k, v in pairs(game.callbackHandlers.touchreleased) do
+            v(game, id, x, y, dx, dy, pressure)
+        end
+    end
     if scene.touchreleased then
         scene:touchreleased(game, id, x, y, dx, dy, pressure)
     end
@@ -156,12 +190,23 @@ end
 
 function love.touchmoved(id, x, y, dx, dy, pressure)
     local scene = game.scenes[game.currentScene]
+    if game.callbackHandlers.touchmoved then
+        for k, v in pairs(game.callbackHandlers.touchmoved) do
+            v(game, id, x, y, dx, dy, pressure)
+        end
+    end
     if scene.touchmoved then
         scene:touchmoved(game, id, x, y, dx, dy, pressure)
     end
 end
 
 function love.update(dt)
+    if game.callbackHandlers.update then
+        for k, v in pairs(game.callbackHandlers.update) do
+            v(game, dt)
+        end
+    end
+
     -- if transition is inactive
     if not game.currentSceneTransition.handler then
         local scene = game.scenes[game.currentScene]
@@ -188,6 +233,12 @@ function love.update(dt)
 end
 
 function love.draw()
+    if game.callbackHandlers.draw then
+        for k, v in pairs(game.callbackHandlers.draw) do
+            v(game)
+        end
+    end
+
     -- if transition is inactive
     if not game.currentSceneTransition.handler then
         local scene = game.scenes[game.currentScene]
@@ -212,6 +263,12 @@ function love.draw()
     for i, v in ipairs(game.toasts.toasts) do
         local toast = game.toasts.toasts[i]
         y = y + game.toasts:renderSingle(toast, 5, 5, y) + 5
+    end
+
+    if game.callbackHandlers.drawOverlay then
+        for k, v in pairs(game.callbackHandlers.drawOverlay) do
+            v(game)
+        end
     end
 end
 
