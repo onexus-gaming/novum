@@ -2,7 +2,7 @@ local ToastHandler = {
     toasts = {
         --[[toast format:
         {
-            type = "debug" or "info" or "warn" or "error",
+            type = "success" or "debug" or "info" or "warn" or "error",
             text = string,
             timePosted = number,
         }
