@@ -11,13 +11,13 @@ place the contents of this repository (excluding the `scenes` folder, they are d
 then, in `main.lua` initialize novum by doing:
 
 ```lua
-local novum = require "novum.main"
+local novum = require "novum"
 ```
 
 or
 
 ```lua
-novum = require "novum.main"
+novum = require "novum"
 ```
 
 ## what does novum do
@@ -28,5 +28,9 @@ novum provides:
 * a transition system to switch between scenes with animations
 * a toast system to display messages
 * an overlay system for debugging purposes
+* a keybinding system
+* a game config system
+
+novum is entirely configurable: every module of the framework can be customized (this is particularly useful if you need to integrate novum components with your game's visuals).
 
 read the wiki for more info
