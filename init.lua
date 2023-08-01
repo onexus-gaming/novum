@@ -9,6 +9,12 @@ function table.contains(t, element)
     return false
 end
 
+function table.length(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
 local game = {
     versioning = {
         novum = "0.2.0",
@@ -138,7 +144,14 @@ end
 
 function love.load()
     if game.startPrint then
-
+        print("novum core v"..game.versioning.novum)
+        print("running game "..game.title.." v"..game.versioning.game)
+        print("discovered:")
+        print(table.length(game.scenes), "scene(s)")
+        print(table.length(game.transitions), "transition(s)")
+        print("configuration:")
+        print(table.length(game.gameConfig.config), "option(s)")
+        print(table.length(game.keyBinds.keys), "custom action(s) (keyboard)")
     end
 
     if game.callbackHandlers.load then
