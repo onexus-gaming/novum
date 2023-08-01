@@ -1,4 +1,4 @@
--- novum core v0.1.0
+-- novum core v0.2.0
 -- ONEXUS, 2023
 -- Keeping this notice in your game is recommended.
 
@@ -10,6 +10,11 @@ function table.contains(t, element)
 end
 
 local game = {
+    versioning = {
+        novum = "0.2.0",
+        game = "0.0.0",
+    },
+
     -- scene system
     scenes = {
         initial = require "scenes.initial"
@@ -43,6 +48,8 @@ local game = {
         multitouch = false
     },
 
+    startPrint = false, -- print info on startup
+
     title = "Novum Core Game"
 }
 
@@ -62,13 +69,27 @@ function game:discoverScene(name)
 end
 
 function game:discoverAllScenes()
-    
+    local sceneList = love.filesystem.getDirectoryItems("scenes")
+    for i, v in ipairs(sceneList) do
+        if(string.sub(v, 1) ~= "_" and string.sub(v, -4) == ".lua") then -- ignore metascenes
+			self:discoverScene(string.sub(v,1,-5))
+		end
+    end
 end
 
 function game:discoverTransition(name)
     -- print(name)
     game.transitions[name] = require("transitions." .. name)
     return game.transitions[name]
+end
+
+function game:discoverAllTransitions()
+    local transitionList = love.filesystem.getDirectoryItems("transitions")
+    for i, v in ipairs(transitionList) do
+        if(string.sub(v, 1) ~= "_" and string.sub(v, -4) == ".lua") then -- ignore metascenes
+			self:discoverTransition(string.sub(v,1,-5))
+		end
+    end
 end
 
 function game:switchSceneInstant(name, data)
@@ -116,6 +137,10 @@ function game:hookCallback(eventName, callback) -- run game-wide code after call
 end
 
 function love.load()
+    if game.startPrint then
+
+    end
+
     if game.callbackHandlers.load then
         for k, v in pairs(game.callbackHandlers.load) do
             v(game)
