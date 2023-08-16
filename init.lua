@@ -44,6 +44,10 @@ local game = {
     gameConfig = require "novum.gameConfig",
     keyBinds = require "novum.keys",
 
+    -- modules
+    timer = require "novum.timer",
+    autoImport = require "novum.autoImport",
+
     -- overlays
     overlays = {
         handlers = {
@@ -161,7 +165,7 @@ function love.load()
     end
     for k, v in pairs(game.scenes) do
         if v.load then
-            v:load()
+            v:load(game)
         end
     end
 end
