@@ -72,6 +72,10 @@ if not game.scenes.initial then
     error('No initial scene found.')
 end
 
+function game:dynamicTitle()
+    love.window.setTitle(self.title .. '(' .. self.versioning.game .. ')')
+end
+
 function game:discoverScene(name)
     -- print(name)
     game.scenes[name] = require("scenes." .. name)
