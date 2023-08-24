@@ -147,7 +147,7 @@ function game:hookCallback(eventName, callback) -- run game-wide code after call
     if not table.contains(self.knownCallbacks, eventName) then
         self.toasts:post('warn', 'novum:hookCallback: callback "'..eventName..'" doesn\'t exist.')
     end
-    table.append(self.callbackHandlers[eventName], callback)
+    table.insert(self.callbackHandlers[eventName], callback)
 end
 
 function love.load()
