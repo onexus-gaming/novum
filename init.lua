@@ -37,7 +37,7 @@ local game = {
     
     -- callback handlers
     callbackHandlers = {},
-    knownCallbacks = {'load', 'keypressed', 'keyreleased', 'textinput', 'touchpressed', 'touchreleased', 'touchmoved', 'update', 'draw', 'overlay'},
+    knownCallbacks = {'load', 'keypressed', 'keyreleased', 'textinput', 'touchpressed', 'touchreleased', 'touchmoved', 'update', 'draw', 'drawOverlay'},
 
     -- handlers
     toasts = require "novum.toasts",
@@ -317,5 +317,7 @@ function love.draw()
         end
     end
 end
+
+game:switchSceneInstant('initial')
 
 return game
