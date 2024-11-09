@@ -30,6 +30,7 @@ novum provides:
 * an overlay system for debugging purposes
 * a keybinding system
 * a game config system
+* a state-based reactive background music system (queue audio tracks based on in-game events)
 
 novum is entirely configurable: every module of the framework can be customized (this is particularly useful if you need to integrate novum components with your game's visuals).
 
