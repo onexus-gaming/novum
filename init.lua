@@ -47,6 +47,7 @@ local game = {
     -- modules
     timer = require "novum.timer",
     autoImport = require "novum.autoImport",
+    reactiveBGM = require "novum.reactiveBGM",
 
     -- overlays
     overlays = {
